@@ -1,5 +1,6 @@
 #pragma once
 
+#include <new>
 #include "alloc.h"
 #include "construct.h"
 
