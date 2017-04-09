@@ -98,6 +98,4 @@ namespace mystl
 		typedef typename __type_traits<T>::is_POD_type is_POD;
 		__uninitialized_fill_aux(first, last, x, is_POD());
 	}
-
-
 }
