@@ -60,6 +60,7 @@ namespace mystl
 			destroy(result, cur);
 			throw;
 		}
+		return cur;
 	}
 
 	template<typename InputIterator, typename ForwardIterator>

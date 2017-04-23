@@ -164,4 +164,63 @@ namespace mystl
 		typedef __true_type is_POD_type;
 	};
 
+	template<typename type>
+	struct is_integral
+	{
+		typedef __false_type value;
+	};
+
+	template<>
+	struct is_integral<bool>
+	{
+		typedef __true_type value;
+	};
+
+	template<>
+	struct is_integral<char>
+	{
+		typedef __true_type value;
+	};
+
+	template<>
+	struct is_integral<char16_t>
+	{
+		typedef __true_type value;
+	};
+
+	template<>
+	struct is_integral<char32_t>
+	{
+		typedef __true_type value;
+	};
+
+	template<>
+	struct is_integral<wchar_t>
+	{
+		typedef __true_type value;
+	};
+
+	template<>
+	struct is_integral<int>
+	{
+		typedef __true_type value;
+	};
+
+	template<>
+	struct is_integral<short>
+	{
+		typedef __true_type value;
+	};
+
+	template<>
+	struct is_integral<long>
+	{
+		typedef __true_type value;
+	};
+
+	template<>
+	struct is_integral<long long>
+	{
+		typedef __true_type value;
+	};
 }

@@ -21,6 +21,9 @@
     <ClCompile Include="alloc.cpp">
       <Filter>头文件</Filter>
     </ClCompile>
+    <ClCompile Include="vector.cpp">
+      <Filter>头文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="allocator.h">
@@ -39,6 +42,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="construct.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="uninitialized.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="vector.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
