@@ -32,6 +32,14 @@ namespace mystl
 		return first;
 	}
 
+	template<typename OutputIterator, typename Size, typename T>
+	OutputIterator fill_n(OutputIterator first, Size n, T&& value)
+	{
+		for (; n > 0; --n, ++first)
+			*first = std::move(value);
+		return first;
+	}
+
 	template<typename Size>
 	char *fill_n(char *first, Size n, const char& value)
 	{
@@ -130,6 +138,32 @@ namespace mystl
 	{
 		memmove(result, first, sizeof(wchar_t) * (last - first));
 		return result + (last - first);
+	}
+
+	//swap
+	template<typename T>
+	inline void swap(T& a, T& b)
+	{
+		T temp = a;
+		a = b;
+		b = temp;
+	}
+
+	template<typename ForwardIterator1, typename ForwardIterator2>
+	inline void iter_swap(ForwardIterator1 a, ForwardIterator2 b)
+	{
+		auto temp = *a;
+		*a = *b;
+		*b = temp;
+	}
+
+	//copy_backword
+	template <typename BidirectionalIterator1, typename BidirectionalIterator2>
+	inline BidirectionalIterator2 copy_backward(BidirectionalIterator1 first,
+		BidirectionalIterator1 last, BidirectionalIterator2 result)
+	{
+		//... = = ge 
+		return std::copy_backward(first, last, result);
 	}
 
 }
