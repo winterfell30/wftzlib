@@ -25,7 +25,7 @@ namespace mystl
 	}
 
 	template<typename T, typename Alloc>
-	void vector<T, Alloc>::insert(iterator position, const size_type& n, const value_type& value)
+	void vector<T, Alloc>::insert(iterator position, size_type n, const value_type& value)
 	{
 	}
 

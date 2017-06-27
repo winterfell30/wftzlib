@@ -171,7 +171,7 @@ namespace mystl
 		{
 			if (finish != end_of_storage)
 			{
-				//std::cout << 666 << std::endl;
+				//std::cout << 233 << std::endl;
 				construct(finish, std::forward<value_type>(value));
 				++finish;
 			}
@@ -190,7 +190,7 @@ namespace mystl
 
 		iterator insert(iterator position, const value_type& value);
 
-		void insert(iterator position, const size_type& n, const value_type& value);
+		void insert(iterator position, size_type n, const value_type& value);
 
 		template <typename InputIterator>
 		void insert(iterator position, InputIterator first, InputIterator last);
@@ -225,8 +225,7 @@ namespace mystl
 
 		void clear()
 		{
-			destroy(start, finish);
-			finish = start;
+			erase(begin(), end());
 		}
 
 		/*size¡¢capacity*/
@@ -237,7 +236,13 @@ namespace mystl
 
 		bool empty() const { return start == finish; }
 
-		void resize(size_type n, value_type val = value_type());
+		void resize(size_type new_size, value_type val = value_type())
+		{
+			if (new_size < size())
+				erase(begin() + new_size, end());
+			else
+				insert(end(), new_size - size(), val);
+		}
 
 		void reserve(size_type n)
 		{
@@ -365,6 +370,7 @@ namespace mystl
 			}
 			else
 			{
+				//finish == end_of_storage ´ËÊ±size() == capacity()
 				const size_type old_size = size();
 				const size_type new_size = old_size != 0 ? 2 * old_size : 1;
 
