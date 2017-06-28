@@ -48,7 +48,7 @@ namespace mystl
 		template<typename InputIterator>
 		vector(InputIterator first, InputIterator last) 
 		{
-			vector_aux(first, last, is_integral<InputIterator>::value());          //参数是两个int时判断是迭代器还是size
+			vector_aux(first, last, mystl::is_integral<InputIterator>::value());          //参数是两个int时判断是迭代器还是size
 		}
 
 		vector(std::initializer_list<T> l)                  //{}默认构造初始化列表
@@ -188,12 +188,21 @@ namespace mystl
 			destroy(finish);
 		}
 
-		iterator insert(iterator position, const value_type& value);
+		iterator insert(iterator position, const value_type& value)
+		{
+			insert_aux(position, value);
+		}
 
-		void insert(iterator position, size_type n, const value_type& value);
+		void insert(iterator position, size_type n, const value_type& value)
+		{
+			insert_aux(position, n, value, mystl::is_integral<size_type>::value());
+		}
 
 		template <typename InputIterator>
-		void insert(iterator position, InputIterator first, InputIterator last);
+		void insert(iterator position, InputIterator first, InputIterator last)
+		{
+			insert_aux(position, first, last, mystl::is_integral<InputIterator>::value());
+		}
 
 		iterator erase(iterator position)
 		{
@@ -239,9 +248,25 @@ namespace mystl
 		void resize(size_type new_size, value_type val = value_type())
 		{
 			if (new_size < size())
+			{
 				erase(begin() + new_size, end());
-			else
-				insert(end(), new_size - size(), val);
+			}
+			else if (new_size > size() && new_size <= capacity())
+			{
+				finish = mystl::uninitialized_fill_n(finish, new_size - size(), val);
+			}
+			else if (new_size > capacity())
+			{
+				auto new_capacity = new_size;
+				iterator new_start = data_allocator::allocate(new_capacity);
+				iterator new_finish = mystl::uninitialized_copy(begin(), end(), new_start);
+				new_finish = mystl::uninitialized_fill_n(new_start, new_capacity, val);
+
+				destroy_and_deallocte();
+				start = new_start;
+				finish = new_finish;
+				end_of_storage = new_finish;
+			}
 		}
 
 		void reserve(size_type n)
@@ -256,7 +281,11 @@ namespace mystl
 			end_of_storage = start + n;
 		}
 
-		void shrink_to_fit();
+		void shrink_to_fit()
+		{
+			data_allocator::deallocate(finish, end_of_storage);
+			end_of_storage = finish;
+		}
 
 		Alloc get_allocator() { return data_allocator; }
 
@@ -400,14 +429,24 @@ namespace mystl
 			}
 		}
 
+		template<typename InputIterator>
+		void insert_aux(iterator position, InputIterator first, InputIterator last, mystl::__false_type)
+		{
+		}
+
+		void insert_aux(iterator position, size_t n, const T& value, mystl::__true_type)
+		{
+			std::cout << "test" << std::endl;
+		}
+
 		//因为参数个数相同，迭代器用两个int的时候会被编译器误会，所以用is_integral判断是迭代器还是n
 		template<typename InputIterator>
-		void vector_aux(InputIterator first, InputIterator last, __false_type)
+		void vector_aux(InputIterator first, InputIterator last, mystl::__false_type)
 		{
 			copy_initialize(first, last);
 		}
 
-		void vector_aux(size_t n, const T& value, __true_type)
+		void vector_aux(size_t n, const T& value, mystl::__true_type)
 		{
 			fill_initialize(n, value);
 		}
