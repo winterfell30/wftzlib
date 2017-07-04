@@ -7,7 +7,7 @@
 
 namespace mystl
 {
-	template<typename T, typename Alloc = allocator<T> >
+	template<typename T, typename Alloc = mystl::allocator<T> >
 	class vector
 	{
 	public:
@@ -95,7 +95,7 @@ namespace mystl
 			mystl::copy_initialize(l.begin(), l.end());
 		}
 
-		~vector()
+		~vector() noexcept
 		{
 			destroy_and_deallocte();
 		}
