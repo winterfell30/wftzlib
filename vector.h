@@ -23,8 +23,8 @@ namespace mystl
 		//还未加入reverse_iterator
 		
 	protected:
-		iterator start;
-		iterator finish;
+		iterator start_;
+		iterator finish_;
 		iterator end_of_storage;
 		using data_allocator = Alloc;
 
@@ -33,7 +33,7 @@ namespace mystl
 		/*构造函数 拷贝构造函数 赋值函数 析构函数*/
 
 		vector():
-			start(nullptr), finish(nullptr), end_of_storage(nullptr) {}
+			start_(nullptr), finish_(nullptr), end_of_storage(nullptr) {}
 
 		explicit vector(size_type n) 
 		{
@@ -58,20 +58,20 @@ namespace mystl
 
 		vector(const vector& rhs) noexcept 
 		{
-			copy_initialize(rhs.start, rhs.finish);
+			copy_initialize(rhs.start_, rhs.finish_);
 		}
 
 		vector(vector&& rhs) noexcept:
-			start(rhs.start), finish(rhs.finish), end_of_storage(rhs.end_of_storage)
+			start_(rhs.start_), finish_(rhs.finish_), end_of_storage(rhs.end_of_storage)
 		{
-			rhs.start = rhs.finish = rhs.end_of_storage = nullptr;
+			rhs.start_ = rhs.finish_ = rhs.end_of_storage = nullptr;
 		}
 
 		vector& operator=(const vector& rhs) noexcept
 		{
 			if (this != &rhs)
 			{
-				mystl::copy_initialize(rhs.start, rhs.finish);
+				mystl::copy_initialize(rhs.start_, rhs.finish_);
 			}
 			return *this;
 		}
@@ -81,10 +81,10 @@ namespace mystl
 			if (this != &rhs)
 			{
 				destroy_and_deallocte();
-				start = rhs.start;
-				finish = rhs.finish;
+				start_ = rhs.start_;
+				finish_ = rhs.finish_;
 				end_of_storage = rhs.end_of_storage;
-				rhs.start = rhs.finish = rhs.end_of_storage = nullptr;
+				rhs.start_ = rhs.finish_ = rhs.end_of_storage = nullptr;
 			}
 			return *this;
 		}
@@ -111,9 +111,9 @@ namespace mystl
 			}
 			else
 			{
-				auto p1 = start;
-				auto p2 = rhs.start;
-				difference_type n = finish - start;
+				auto p1 = start_;
+				auto p2 = rhs.start_;
+				difference_type n = finish_ - start_;
 				while (n--)
 				{
 					if (*p1 != *p2)
@@ -132,13 +132,13 @@ namespace mystl
 
 		/*迭代器接口*/
 
-		iterator begin() { return start; }
+		iterator begin() { return start_; }
 
-		const_iterator cbegin() const { return start; }
+		const_iterator cbegin() const { return start_; }
 
-		iterator end() { return finish; }
+		iterator end() { return finish_; }
 
-		const_iterator cend() const { return finish; }
+		const_iterator cend() const { return finish_; }
 
 		//待加入reverse_iterator
 
@@ -156,10 +156,10 @@ namespace mystl
 
 		void push_back(const value_type& value)
 		{
-			if (finish != end_of_storage)
+			if (finish_ != end_of_storage)
 			{
-				construct(finish, value);
-				++finish;
+				construct(finish_, value);
+				++finish_;
 			}
 			else
 			{
@@ -169,11 +169,11 @@ namespace mystl
 
 		void push_back(value_type&& value)
 		{
-			if (finish != end_of_storage)
+			if (finish_ != end_of_storage)
 			{
 				//std::cout << 233 << std::endl;
-				construct(finish, std::forward<value_type>(value));
-				++finish;
+				construct(finish_, std::forward<value_type>(value));
+				++finish_;
 			}
 			else
 			{
@@ -184,8 +184,8 @@ namespace mystl
 
 		void pop_back()
 		{
-			--finish;
-			destroy(finish);
+			--finish_;
+			destroy(finish_);
 		}
 
 		iterator insert(iterator position, const value_type& value)
@@ -198,6 +198,7 @@ namespace mystl
 			insert_aux(position, n, value, mystl::is_integral<size_type>::value());
 		}
 
+		//为了让编译器能区分出这个和上面的insert，用is_integral区分
 		template <typename InputIterator>
 		void insert(iterator position, InputIterator first, InputIterator last)
 		{
@@ -208,17 +209,17 @@ namespace mystl
 		{
 			//后续元素向前移动覆盖被删除pos然后删除最后一个多余节点
 			if (position + 1 != end())
-				copy(position + 1, finish, position);
-			--finish;
-			destroy(finish);
+				copy(position + 1, finish_, position);
+			--finish_;
+			destroy(finish_);
 			return position;
 		}
 
 		iterator erase(iterator first, iterator last)
 		{
-			iterator pos = copy(last, finish, first);
-			destroy(pos, finish);
-			finish -= (last - first);
+			iterator pos = copy(last, finish_, first);
+			destroy(pos, finish_);
+			finish_ -= (last - first);
 			return first;
 		}
 
@@ -226,8 +227,8 @@ namespace mystl
 		{
 			if (this != &rhs)
 			{
-				mystl::swap(start, rhs.start);
-				mystl::swap(finish, rhs.finish);
+				mystl::swap(start_, rhs.start_);
+				mystl::swap(finish_, rhs.finish_);
 				mystl::swap(end_of_storage, rhs.end_of_storage);
 			}
 		}
@@ -239,11 +240,11 @@ namespace mystl
 
 		/*size、capacity*/
 
-		difference_type size() const { return finish - start; }
+		difference_type size() const { return finish_ - start_; }
 
-		difference_type capacity() const { return end_of_storage - start; }
+		difference_type capacity() const { return end_of_storage - start_; }
 
-		bool empty() const { return start == finish; }
+		bool empty() const { return start_ == finish_; }
 
 		void resize(size_type new_size, value_type val = value_type())
 		{
@@ -253,7 +254,7 @@ namespace mystl
 			}
 			else if (new_size > size() && new_size <= capacity())
 			{
-				finish = mystl::uninitialized_fill_n(finish, new_size - size(), val);
+				finish_ = mystl::uninitialized_fill_n(finish_, new_size - size(), val);
 			}
 			else if (new_size > capacity())
 			{
@@ -263,8 +264,8 @@ namespace mystl
 				new_finish = mystl::uninitialized_fill_n(new_start, new_capacity, val);
 
 				destroy_and_deallocte();
-				start = new_start;
-				finish = new_finish;
+				start_ = new_start;
+				finish_ = new_finish;
 				end_of_storage = new_finish;
 			}
 		}
@@ -274,17 +275,17 @@ namespace mystl
 			if (n <= capacity())
 				return;
 			iterator new_start = data_allocator::allocate(n);
-			iterator new_finish = mystl::uninitialized_copy(start, finish, new_start);
+			iterator new_finish = mystl::uninitialized_copy(start_, finish_, new_start);
 			destroy_and_deallocte();
-			start = new_start;
-			finish = new_finish;
-			end_of_storage = start + n;
+			start_ = new_start;
+			finish_ = new_finish;
+			end_of_storage = start_ + n;
 		}
 
 		void shrink_to_fit()
 		{
-			data_allocator::deallocate(finish, end_of_storage);
-			end_of_storage = finish;
+			data_allocator::deallocate(finish_, end_of_storage);
+			end_of_storage = finish_;
 		}
 
 		Alloc get_allocator() { return data_allocator; }
@@ -295,9 +296,9 @@ namespace mystl
 		{
 			if (capacity() != 0)
 			{
-				data_allocator::destroy(start, finish);
-				if (start)
-					data_allocator::deallocate(start, end_of_storage - start);
+				data_allocator::destroy(start_, finish_);
+				if (start_)
+					data_allocator::deallocate(start_, end_of_storage - start_);
 			}
 		}
 
@@ -327,34 +328,34 @@ namespace mystl
 		void copy_initialize(InputIterator first, InputIterator last)
 		{
 			destroy_and_deallocte();
-			start = allocate_and_copy(first, last);
-			finish = start + (last - first);
-			end_of_storage = finish;
+			start_ = allocate_and_copy(first, last);
+			finish_ = start_ + (last - first);
+			end_of_storage = finish_;
 		}
 
 		void fill_initialize(size_t n, const T& value)
 		{
 			destroy_and_deallocte();
-			start = allocate_and_fill(n, value);
-			finish = start + n;
-			end_of_storage = finish;
+			start_ = allocate_and_fill(n, value);
+			finish_ = start_ + n;
+			end_of_storage = finish_;
 		}
 
 		void fill_initialize(size_t n, T&& value)
 		{
 			destroy_and_deallocte();
-			start = allocate_and_fill(n, std::forward<T>(value));
-			finish = start + n;
-			end_of_storage = finish;
+			start_ = allocate_and_fill(n, std::forward<T>(value));
+			finish_ = start_ + n;
+			end_of_storage = finish_;
 		}
 
 		void insert_aux(iterator position, const T& val)
 		{
-			if (finish != end_of_storage)
+			if (finish_ != end_of_storage)
 			{
-				construct(finish, *(finish - 1));
-				++finish;
-				mystl::copy_backward(position, finish - 2, finish - 1);
+				construct(finish_, *(finish_ - 1));
+				++finish_;
+				mystl::copy_backward(position, finish_ - 2, finish_ - 1);
 				mystl::fill_n(position, 1, val);
 			}
 			else
@@ -366,10 +367,10 @@ namespace mystl
 				iterator new_finish = new_start;
 				try
 				{
-					new_finish = mystl::uninitialized_copy(start, position, new_start);
+					new_finish = mystl::uninitialized_copy(start_, position, new_start);
 					construct(new_finish, val);
 					++new_finish;
-					new_finish = mystl::uninitialized_copy(position, finish, new_finish);
+					new_finish = mystl::uninitialized_copy(position, finish_, new_finish);
 				}
 				catch (...)
 				{
@@ -379,22 +380,22 @@ namespace mystl
 					throw;
 				}
 
-				destroy(start, finish);
-				data_allocator::deallocate(start, old_size);
+				destroy(start_, finish_);
+				data_allocator::deallocate(start_, old_size);
 
-				start = new_start;
-				finish = new_finish;
+				start_ = new_start;
+				finish_ = new_finish;
 				end_of_storage = new_start + new_size;
 			}
 		}
 
 		void insert_aux(iterator position, T&& val)
 		{
-			if (finish != end_of_storage)
+			if (finish_ != end_of_storage)
 			{
-				construct(finish, std::move(*(finish - 1)));
-				++finish;
-				mystl::copy_backward(position, finish - 2, finish - 1);
+				construct(finish_, std::move(*(finish_ - 1)));
+				++finish_;
+				mystl::copy_backward(position, finish_ - 2, finish_ - 1);
 				mystl::fill_n(position, 1, std::forward<T>(val));
 			}
 			else
@@ -407,10 +408,10 @@ namespace mystl
 				iterator new_finish = new_start;
 				try
 				{
-					new_finish = mystl::uninitialized_copy(start, position, new_start);
+					new_finish = mystl::uninitialized_copy(start_, position, new_start);
 					construct(new_finish, std::forward<T>(val));
 					++new_finish;
-					new_finish = mystl::uninitialized_copy(position, finish, new_finish);
+					new_finish = mystl::uninitialized_copy(position, finish_, new_finish);
 				}
 				catch (...)
 				{
@@ -420,11 +421,11 @@ namespace mystl
 					throw;
 				}
 
-				destroy(start, finish);
-				data_allocator::deallocate(start, old_size);
+				destroy(start_, finish_);
+				data_allocator::deallocate(start_, old_size);
 
-				start = new_start;
-				finish = new_finish;
+				start_ = new_start;
+				finish_ = new_finish;
 				end_of_storage = new_start + new_size;
 			}
 		}
@@ -432,6 +433,50 @@ namespace mystl
 		template<typename InputIterator>
 		void insert_aux(iterator position, InputIterator first, InputIterator last, mystl::__false_type)
 		{
+			difference_type num_of_insert = distance(first, last);
+			difference_type num_of_left = end_of_storage - finish_;
+
+			if (num_of_insert <= num_of_left)
+			{
+				if (position + num_of_insert < finish_)
+				{
+					mystl::uninitialized_copy(finish_ - num_of_insert, finish_, finish_);
+					mystl::copy_backward(position, finish_ - num_of_insert, finish_);
+					mystl::copy(first, last, start_);
+				}
+				else
+				{
+					mystl::uninitialized_copy(position, finish_, position + num_of_insert);
+					mystl::copy(first, last, position);
+				}
+				finish_ += num_of_insert;
+			}
+			else
+			{
+				const size_type new_capacity = get_new_capacity(num_of_insert);
+
+				iterator new_start = data_allocator::allocate(new_capacity);
+				iterator new_finish = new_start;
+				try
+				{
+					new_finish = mystl::uninitialized_copy(start_, position, new_start);
+					new_finish = mystl::uninitialized_copy(first, last, new_finish);
+					new_finish = mystl::uninitialized_copy(position, finish, new_finish);
+				}
+				catch (...)
+				{
+					destroy(new_start, new_finish);
+					data_allocator::deallocate(new_start, distance(new_start, new_finish));
+					throw;
+				}
+
+				destroy(start_, finish_);
+				data_allocator::deallocate(start_, distance(start_, end_of_storage));
+
+				start_ = new_start;
+				finish_ = new_finish;
+				end_of_storage = new_start + new_capacity;
+			}
 		}
 
 		void insert_aux(iterator position, size_t n, const T& value, mystl::__true_type)
@@ -449,6 +494,13 @@ namespace mystl
 		void vector_aux(size_t n, const T& value, mystl::__true_type)
 		{
 			fill_initialize(n, value);
+		}
+
+		size_type get_new_capacity(size_type add_size) const
+		{
+			size_type old_capacity = end_of_storage - start_;
+			size_type tmp = mystl::max(add_size, old_capacity);
+			return (old_capacity != 0 ? (old_capacity + tmp) : add_size);
 		}
 
 	};

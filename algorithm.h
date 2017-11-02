@@ -162,8 +162,34 @@ namespace mystl
 	inline BidirectionalIterator2 copy_backward(BidirectionalIterator1 first,
 		BidirectionalIterator1 last, BidirectionalIterator2 result)
 	{
-		//... = = ge 
+		//... = = ¸ë
 		return std::copy_backward(first, last, result);
+	}
+
+	//min
+	template <typename T>
+	const T& min(const T& a, const T& b)
+	{
+		return a < b ? a : b;
+	}
+
+	template <typename T, typename Func>
+	const T& min(const T& a, const T& b, Func cmp)
+	{
+		return cmp(a, b) ? a : b;
+	}
+
+	//max
+	template <typename T>
+	const T& max(const T& a, const T& b)
+	{
+		return a > b ? a : b;
+	}
+
+	template <typename T, typename Func>
+	const T& max(const T& a, const T& b, Func cmp)
+	{
+		return cmp(b, a) ? a : b;
 	}
 
 }

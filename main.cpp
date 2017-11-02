@@ -1,11 +1,8 @@
-<<<<<<< HEAD
 //ÓÃÓÚ²âÊÔ¿Õ¼äÅäÖÃÆ÷
 #include <time.h>
 #include "vector.h"
 #include <vector>
 #include <thread>
-
-void g() { std::cout << "Hello world" << std::endl; }
 
 #define print(x) std::cout << #x << "=" << x << std::endl;
 
@@ -23,13 +20,4 @@ int main()
 	for (mystl::vector<int>::iterator it = v.begin(); it != v.end(); it++) print(*it);
 	finish = clock();
 	std::cout << "time: " << (double)(finish - start) << std::endl;
-=======
-#include "vector.h"
-
-int main()
-{
-	mystl::vector<int> a;
-	a.insert(a.begin(), 3, 3);
->>>>>>> 1edf3499f81576aee1ac1d52adf065b9397bcbf7
-	return 0;
 }

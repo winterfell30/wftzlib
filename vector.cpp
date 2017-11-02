@@ -3,20 +3,6 @@
 
 namespace mystl
 {
-	/*size¡¢capacity*/
-	template<typename T, typename Alloc>
-	void vector<T, Alloc>::resize(size_type n, value_type val = value_type())
-	{
-
-	}
-
-
-	template<typename T, typename Alloc>
-	void vector<T, Alloc>::shrink_to_fit()
-	{
-
-	}
-
 
 	template<typename T, typename Alloc>
 	typename vector<T, Alloc>::iterator vector<T, Alloc>::insert(iterator position, const value_type& value)
