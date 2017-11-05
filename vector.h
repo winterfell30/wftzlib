@@ -481,7 +481,47 @@ namespace mystl
 
 		void insert_aux(iterator position, size_t n, const T& value, mystl::__true_type)
 		{
-			std::cout << "test" << std::endl;
+			difference_type num_of_left = end_of_storage - finish_;
+			if (num_of_left >= n)
+			{
+				if (position + n < finish_)
+				{
+					mystl::uninitialized_copy(finish_ - n, finish_, finish_);
+					mystl::copy_backward(position, finish_ - n, finish_);
+					mystl::uninitialized_fill_n(position, n, value);
+				}
+				else
+				{
+					mystl::uninitialized_copy(position, finish_, position + n);
+					mystl::uninitialized_fill_n(position, n, value);
+				}
+				finish_ += n;
+			}
+			else
+			{
+				const size_type new_capacity = get_new_capacity(n);
+
+				iterator new_start = data_allocator::allocate(new_capacity);
+				iterator new_finish = new_start;
+				try
+				{
+					new_finish = mystl::uninitialized_copy(start_, position, new_start);
+					new_finish = mystl::uninitialized_fill_n(position, n, value);
+					new_finish = mystl::uninitialized_copy(position, finish_, new_finish);
+				}
+				catch (...)
+				{
+					destroy(new_start, new_finish);
+					data_allocator::deallocate(new_start, distance(new_start, new_finish));
+				}
+
+				destroy(start_, finish_);
+				data_allocator::deallocate(new, distance(start_, finish_));
+
+				start_ = new_start;
+				finish_ = new_finish;
+				end_of_storage = new_start + new_capacity;
+			}
 		}
 
 		//因为参数个数相同，迭代器用两个int的时候会被编译器误会，所以用is_integral判断是迭代器还是n
@@ -502,6 +542,5 @@ namespace mystl
 			size_type tmp = mystl::max(add_size, old_capacity);
 			return (old_capacity != 0 ? (old_capacity + tmp) : add_size);
 		}
-
 	};
 }
