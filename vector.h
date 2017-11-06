@@ -56,7 +56,7 @@ namespace mystl
 			copy_initialize(l.begin(), l.end());
 		}
 
-		vector(const vector& rhs) noexcept 
+		vector(const vector& rhs)  
 		{
 			copy_initialize(rhs.start_, rhs.finish_);
 		}
@@ -67,7 +67,7 @@ namespace mystl
 			rhs.start_ = rhs.finish_ = rhs.end_of_storage = nullptr;
 		}
 
-		vector& operator=(const vector& rhs) noexcept
+		vector& operator=(const vector& rhs)
 		{
 			if (this != &rhs)
 			{
@@ -89,7 +89,7 @@ namespace mystl
 			return *this;
 		}
 
-		vector& operator=(std::initializer_list<T> l) noexcept
+		vector& operator=(std::initializer_list<T>& l) 
 		{
 			destroy_and_deallocte();
 			mystl::copy_initialize(l.begin(), l.end());
@@ -167,17 +167,15 @@ namespace mystl
 			}
 		}
 
-		void push_back(value_type&& value)
+		void push_back(value_type&& value) 
 		{
 			if (finish_ != end_of_storage)
 			{
-				//std::cout << 233 << std::endl;
 				construct(finish_, std::forward<value_type>(value));
 				++finish_;
 			}
 			else
 			{
-				//std::cout << "2333" << std::endl;
 				insert_aux(end(), std::forward<value_type>(value));
 			}
 		}
