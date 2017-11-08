@@ -65,7 +65,7 @@ namespace mystl
 		list(InputIterator first, InputIterator last);
 		list(const list& l);
 		list(list&& l) noexcept;
-		list(std::initializer_list<value_type>& il);
+		list(std::initializer_list<value_type> il);
 		~list() noexcept;
 		list& operator=(const list& l);
 		list& operator=(list&& l) noexcept;
@@ -146,7 +146,7 @@ namespace mystl
 		list_node yield(list_node first, list_node last, size_type cnt);
 		list_node erase(list_node node);
 	protected:
-		list_node head;             //dummy 
+		list_node head;             //dummy，head->prev为链表的尾节点，head->next为链表的起点
 		size_type size_;
 		using data_allocator = Alloc;
 	};
@@ -229,31 +229,41 @@ namespace mystl
 	template <typename T, typename Alloc>
 	list<T, Alloc>::list_node list<T, Alloc>::insert_aux(list<T, Alloc>::list_node pos, list<T, Alloc>::list_node node)
 	{
-
+		return insert_aux(pos, node, node, 1);
 	}
 
 	template <typename T, typename Alloc>
-	list<T, Alloc>::list_node list<T, Alloc>::insert_aux(list<T, Alloc>::list_node pos, list<T, Alloc>::list_node first, list<T, Alloc>::list_node last)
+	list<T, Alloc>::list_node list<T, Alloc>::insert_aux(list<T, Alloc>::list_node pos, list<T, Alloc>::list_node first, list<T, Alloc>::list_node last, size_t n)
 	{
-
+		size_ += n;
+		first->prev = pos->prev;
+		pos->prev->next = first;
+		last->next = pos;
+		pos->prev = last;
+		return first;
 	}
 
 	template <typename T, typename Alloc>
 	list<T, Alloc>::list_node list<T, Alloc>::yield(list<T, Alloc>::list_node node)
 	{
-
+		return yield(node, node, 1);
 	}
 
 	template <typename T, typename Alloc>
 	list<T, Alloc>::list_node list<T, Alloc>::yield(list<T, Alloc>::list_node first, list<T, Alloc>::list_node last, size_t n)
 	{
-
+		size_ -= n;
+		first->prev->next = last->next;
+		last->next->prev = first->prev;
+		return first;
 	}
 
 	template <typename T, typename Alloc>
-	list<T, Alloc>::list_node list<T, Alloc>::erase(list<T, Alloc>::list_node)
+	list<T, Alloc>::list_node list<T, Alloc>::erase(list<T, Alloc>::list_node pos)
 	{
-
+		list<T, Alloc>::list_node res = pos->next;
+		del_node(yield(pos));
+		return res;
 	}
 
 	template <typename T, typename Alloc>
@@ -263,32 +273,198 @@ namespace mystl
 
 	template <typename T, typename Alloc>
 	list<T, Alloc>::list(size_t n, const list<T, Alloc>::value_type& val = value_type()) :
-		head(new_node()), size_(n)
+		head(new_node()), size_(0)
 	{
 		for (size_t i = 0; i < n; i++)
 			push_back(val);
 	}
 
 	template <typename T, typename Alloc>
+	template <typename InputIterator>
+	list<T, Alloc>::list(InputIterator first, InputIterator last) :
+		head(new_node()), size_(0)
+	{
+		for (; first != last; first++)
+			push_back(*first);
+	}
 
 	template <typename T, typename Alloc>
+	list<T, Alloc>::list(const list& l) :
+		list(l.begin(), l.end())
+	{
+	}
 
 	template <typename T, typename Alloc>
+	list<T, Alloc>::list(list&& l) :
+		list(std::move(l))
+	{
+	}
 
 	template <typename T, typename Alloc>
+	list<T, Alloc>::list(std::initializer_list<T> il) :
+		list(l.begin(), l.end())
+	{
+	}
 
 	template <typename T, typename Alloc>
+	list<T, Alloc>::~list() noexcept
+	{
+		list_node p = head;
+		while (p != nullptr)
+		{
+			list_node tmp = p;
+			p = p->next;
+			del_node(tmp);
+		}
+	}
 
 	template <typename T, typename Alloc>
+	list<T, Alloc>& list<T, Alloc>::operator=(const list& l)
+	{
+		list(l).swap(*this);
+	}
 
 	template <typename T, typename Alloc>
+	list<T, Alloc>& list<T, Alloc>::operator=(list&& l)
+	{
+		list(l).swap(*this);
+	}
 
 	template <typename T, typename Alloc>
+	list<T, Alloc>& list<T, Alloc>::operator=(std::initializer_list<T> il)
+	{
+		list(l).swap(*this);
+	}
 
 	template <typename T, typename Alloc>
+	list<T, Alloc>::iterator list<T, Alloc>::begin() noexcept
+	{
+		return iterator(head->next);
+	}
 
+	template <typename T, typename Alloc>
+	list<T, Alloc>::iterator list<T, Alloc>::end() noexcept
+	{
+		return iterator(head);
+	}
 
+	template <typename T, typename Alloc>
+	list<T, Alloc>::const_iterator list<T, Alloc>::begin() const noexcept
+	{
+		return const_iterator(head->next);
+	}
 
+	template <typename T, typename Alloc>
+	list<T, Alloc>::const_iterator list<T, Alloc>::end() const noexcept
+	{
+		return const_iterator(head);
+	}
 
+	template <typename T, typename Alloc>
+	list<T, Alloc>::const_iterator list<T, Alloc>::cbegin() const noexcept
+	{
+		return const_iterator(head->next);
+	}
 
+	template <typename T, typename Alloc>
+	list<T, Alloc>::const_iterator list<T, Alloc>::cend() const noexcept
+	{
+		return const_iterator(head);
+	}
+
+	template <typename T, typename Alloc>
+	bool list<T, Alloc>::empty() const
+	{
+		return size_ == 0;
+	}
+
+	template <typename T, typename Alloc>
+	size_t list<T, Alloc>::size() const
+	{
+		return size_;
+	}
+
+	template <typename T, typename Alloc>
+	list<T, Alloc>::value_type& list<T, Alloc>::front()
+	{
+		return *(this->begin());
+	}
+
+	template <typename T, typename Alloc>
+	const list<T, Alloc>::value_type& list<T, Alloc>::front() const
+	{
+		return *(this->begin());
+	}
+
+	template <typename T, typename Alloc>
+	list<T, Alloc>::value_type& list<T, Alloc>::back()
+	{
+		return *(--this->end());
+	}
+
+	template <typename T, typename Alloc>
+	const list<T, Alloc>::value_type& list<T, Alloc>::back() const
+	{
+		return *(--this->end());
+	}
+
+	template <typename T, typename Alloc>
+	void list<T, Alloc>::clear()
+	{
+		resize(0);
+	}
+
+	template <typename T, typename Alloc>
+	void list<T, Alloc>::resize(size_t n)
+	{
+		
+	}
+
+	template <typename T, typename Alloc>
+	void list<T, Alloc>::resize(size_t n, const list<T, Alloc>::value_type& val)
+	{
+
+	}
+
+	template <typename T, typename Alloc>
+	void list<T, Alloc>::swap(list<T, Alloc>& l)
+	{
+
+	}
+
+	template <typename T, typename Alloc>
+	void list<T, Alloc>::push_front(const list<T, Alloc>::value_type& val)
+	{
+
+	}
+
+	template <typename T, typename Alloc>
+	void list<T, Alloc>::push_front(list<T, Alloc>::value_type&& val)
+	{
+
+	}
+
+	template <typename T, typename Alloc>
+	void list<T, Alloc>::push_back(const list<T, Alloc>::value_type& val)
+	{
+
+	}
+
+	template <typename T, typename Alloc>
+	void list<T, Alloc>::push_back(list<T, Alloc>&& val)
+	{
+
+	}
+
+	template <typename T, typename Alloc>
+	void list<T, Alloc>::pop_front()
+	{
+
+	}
+
+	template <typename T, typename Alloc>
+	void list<T, Alloc>::pop_back()
+	{
+
+	}
 }
