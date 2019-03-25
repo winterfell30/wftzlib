@@ -1,13 +1,3 @@
-/*================================================================
-*   Copyright (C) Baidu Map Ltd. All rights reserved.
-*   
-*   文件名称：doublebuffer.h
-*   创 建 者：wudonglin@baidu.com
-*   创建日期：2018年11月19日
-*   描    述：
-*
-================================================================*/
-
 #pragma once
 #include <memory>
 #include <queue>
