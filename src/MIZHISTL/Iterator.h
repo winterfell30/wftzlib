@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+
 namespace mystl 
 {
 	struct input_iterator_tag {};
@@ -19,7 +21,7 @@ namespace mystl
 		typedef Reference reference;
 	};
 
-	//ÓÃÓÚİÍÈ¡µü´úÆ÷ÌØĞÔ
+	//ç”¨äºèƒå–è¿­ä»£å™¨ç‰¹æ€§
 	template<typename Iterator>
 	struct iterator_traits
 	{
@@ -30,7 +32,7 @@ namespace mystl
 		typedef typename Iterator::reference         reference;
 	};
 
-	//Õë¶ÔÔ­ÉúÖ¸ÕëµÄÆ«ÌØ»¯°æ
+	//é’ˆå¯¹åŸç”ŸæŒ‡é’ˆçš„åç‰¹åŒ–ç‰ˆ
 	template<typename T>
 	struct iterator_traits<T*>
 	{

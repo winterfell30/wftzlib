@@ -146,7 +146,7 @@ namespace mystl
 		list_node yield(list_node first, list_node last, size_type cnt);
 		list_node erase(list_node node);
 	protected:
-		list_node head;             //dummy£¬head->prevÎªÁ´±íµÄÎ²½Úµã£¬head->nextÎªÁ´±íµÄÆðµã
+		list_node head;             //dummyï¿½ï¿½head->prevÎªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î²ï¿½Úµã£¬head->nextÎªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		size_type size_;
 		using data_allocator = Alloc;
 	};
@@ -206,7 +206,7 @@ namespace mystl
 	}
 
 	template <typename T>
-	bool operator!=(const __list_iterator<T>& rhs, const __list_iterator<T>& rhs)
+	bool operator!=(const __list_iterator<T>& lhs, const __list_iterator<T>& rhs)
 	{
 		return !(lhs == rhs);
 	}
@@ -267,7 +267,7 @@ namespace mystl
 	}
 
 	template <typename T, typename Alloc>
-	explicit list<T, Alloc>::list() :
+	list<T, Alloc>::list() :
 		head(new_node()), size_(0)
 	{}
 
@@ -295,14 +295,14 @@ namespace mystl
 	}
 
 	template <typename T, typename Alloc>
-	list<T, Alloc>::list(list&& l) :
+	list<T, Alloc>::list(list&& l) noexcept : 
 		list(std::move(l))
 	{
 	}
 
 	template <typename T, typename Alloc>
 	list<T, Alloc>::list(std::initializer_list<T> il) :
-		list(l.begin(), l.end())
+		list(il.begin(), il.end())
 	{
 	}
 
@@ -325,13 +325,13 @@ namespace mystl
 	}
 
 	template <typename T, typename Alloc>
-	list<T, Alloc>& list<T, Alloc>::operator=(list&& l)
+	list<T, Alloc>& list<T, Alloc>::operator=(list&& l) noexcept
 	{
 		list(l).swap(*this);
 	}
 
 	template <typename T, typename Alloc>
-	list<T, Alloc>& list<T, Alloc>::operator=(std::initializer_list<T> il)
+	list<T, Alloc>& list<T, Alloc>::operator=(std::initializer_list<T>& il)
 	{
 		list(l).swap(*this);
 	}
@@ -427,7 +427,7 @@ namespace mystl
 	}
 
 	template <typename T, typename Alloc>
-	void list<T, Alloc>::swap(list<T, Alloc>& l)
+	void list<T, Alloc>::swap(list<value_type>& l)
 	{
 
 	}
@@ -451,9 +451,8 @@ namespace mystl
 	}
 
 	template <typename T, typename Alloc>
-	void list<T, Alloc>::push_back(list<T, Alloc>&& val)
+	void list<T, Alloc>::push_back(list<T, Alloc>::value_type&& val)
 	{
-
 	}
 
 	template <typename T, typename Alloc>

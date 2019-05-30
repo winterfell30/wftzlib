@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstring>
+
 #include "Iterator.h"
 #include "allocator.h"
 
@@ -72,7 +74,7 @@ namespace mystl
 	template<typename InputIterator, typename OutputIterator>
 	inline OutputIterator __copy(InputIterator first, InputIterator last, OutputIterator result, input_iterator_tag)
 	{
-		//ÒÔµü´úÆ÷µÈÍ¬Óë·ñ¿ØÖÆÑ­»·£¬ËÙ¶ÈÂý
+		//ï¿½Ôµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ­ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½ï¿½ï¿½
 		for (; first != last; ++result, ++first)
 			*result = *first;
 		return result;
@@ -81,7 +83,7 @@ namespace mystl
 	template<typename RandomAccessIterator, typename OutputIterator, typename Distance>
 	inline OutputIterator __copy_d(RandomAccessIterator first, RandomAccessIterator last, OutputIterator result, Distance*)
 	{
-		//ÒÔn¾ö¶¨Ñ­»·µÄÖ´ÐÐ´ÎÊý£¬ËÙ¶È¿ì
+		//ï¿½ï¿½nï¿½ï¿½ï¿½ï¿½Ñ­ï¿½ï¿½ï¿½ï¿½Ö´ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶È¿ï¿½
 		for (Distance n = last - first; n > 0; --n, ++first, ++result)
 			*result = *first;
 		return result;
@@ -162,7 +164,7 @@ namespace mystl
 	inline BidirectionalIterator2 copy_backward(BidirectionalIterator1 first,
 		BidirectionalIterator1 last, BidirectionalIterator2 result)
 	{
-		//... = = ¸ë
+		//... = = ï¿½ï¿½
 		return std::copy_backward(first, last, result);
 	}
 
