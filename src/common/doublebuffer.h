@@ -4,6 +4,8 @@
 #include <mutex>
 #include <atomic>
 
+namespace wftz {
+
 /*
 * 双buffer 单线程写，多线程读
 * 主buffer处理结束时触发buffer指针交换
@@ -23,7 +25,7 @@ public:
             _mutex.push_back(std::make_shared<std::mutex>());
         }
     }
-    ~DoubleBuffer() = default;
+    virtual ~DoubleBuffer() = default;
 
     void push(const value_type& data)
     {
@@ -100,3 +102,5 @@ private:
     std::atomic<int> _idx;
     std::vector<std::shared_ptr<std::mutex> > _mutex;
 };
+
+}
